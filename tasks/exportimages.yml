@@ -12,9 +12,9 @@
   when: 
     - exportpath.stat.exists == false
 
-- name: Get a list of all containers and export
-  shell: |
-    docker save $(docker images | awk 'NR>2 {print last} {last=$1}') -o "{{rh_ocp_export_path_core}}"
+- name: Get a list of all containers and export 
+  shell: | 
+    docker save $(docker images | awk 'NR>2 {print last} {last=$1}') -o "{{rh_ocp_export_path_core}}" # Breaks if there aint any containers
   register: images_list
   tags:
     - core
