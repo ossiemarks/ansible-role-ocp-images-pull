@@ -1,5 +1,17 @@
 ---
 
+- name: "Does the export directory exist"
+  stat:
+    path: "{{rh_ocp_export_path}}"
+  register: exportpath
+
+- name: "Creates directory if missing"
+  file:
+    path: "{{rh_ocp_export_path}}"
+    state: directory
+  when: 
+    - exportpath.stat.exists == false
+
 - name: Get a list of all containers and export
   shell: |
     docker save $(docker images | awk 'NR>2 {print last} {last=$1}') -o "{{rh_ocp_export_path_core}}"
@@ -7,8 +19,8 @@
   tags:
     - core
   when: 
-    - 'rhexport_images == "yes"' 
-    - 'rhexport_core == "yes"'
+    - rhexport_images == "yes" 
+    - rhexport_core == "yes"
 
 - name: Jenkins and Nexus images only for export
   shell: |
@@ -17,6 +29,6 @@
   tags:
     - apps
   when:
-    - 'rhexport_images = "yes"'
-    - 'rhexport_apps = "yes"'
+    - rhexport_images == "yes"
+    - rhexport_apps == "yes"
 
